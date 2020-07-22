@@ -1,60 +1,44 @@
 let canvas = document.querySelector("#myCanvas");
 let ctx = canvas.getContext("2d");
 
-// // variables
+// Canvas variables
 let canvasWidth = canvas.width;
 let canvasHeight = canvas.height;
-let blockSize = 20;
-let snake = [];
+let gridSize = 20;
+
+// Snake variables
 let snakeX = canvasWidth / 2;
 let snakeY = canvasHeight / 2;
-let directionX = 3;
-let directionY = 3;
 let snakeSize = 20;
-let noOfBoxesOnCanvas = 1;
+let directionX = 2;
+let directionY = 2;
 
-// variables for buttons pressed
-let rightPressed = false;
-let leftPressed = false;
-let upPressed = false;
-let downPressed = false;
+// Blocks variables
+let blockSize = 20;
+let blockX = randomBlockSpot(0, canvasWidth - blockSize);
+let blockY = randomBlockSpot(0, canvasHeight - blockSize);
 
 // Function to draw snake
 function drawSnake() {
-    ctx.beginPath();
-    ctx.rect(snakeX, snakeY, snakeSize, snakeSize);
-    ctx.fillStyle = "orange";
-    ctx.fill();
-    ctx.closePath();
-
-    // snakeX += 3;
-    // moveSnake();
+	ctx.beginPath();
+	ctx.rect(snakeX, snakeY, snakeSize, snakeSize);
+	ctx.fillStyle = "orange";
+	ctx.fill();
+	ctx.closePath();
 }
-
-// function moveSnake() {
-//     ctx.beginPath();
-//     ctx.rect(snakeX, snakeY, 20, 20);
-//     ctx.fillStyle = "orange";
-//     ctx.fill();
-//     ctx.closePath();
-
-// }
 
 // Function to choose a random spot for the blocks
 function randomBlockSpot(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
+	return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 // Function to draw the random blocks on the canvas
 function drawBlocks() {
-    // x and y positioins to draw the box
-    let blockX = randomBlockSpot(0, canvasWidth - blockSize);
-    let blockY = randomBlockSpot(0, canvasHeight - blockSize);
-    ctx.beginPath();
-    ctx.rect(blockX, blockY, blockSize, blockSize);
-    ctx.fillStyle = "grey";
-    ctx.fill();
-    ctx.closePath();
+	ctx.beginPath();
+	ctx.rect(blockX, blockY, blockSize, blockSize);
+	ctx.fillStyle = "grey";
+	ctx.fill();
+	ctx.closePath();
 }
 
 // // Function to check for collision
@@ -79,64 +63,57 @@ function drawBlocks() {
 //     }
 // }
 
-// Function to check whenever button is pressed
+// Function to check when button is pressed
 function keyDownHandler(e) {
-    if (e.key == "Right" || e.key == "ArrowRight") {
-        rightPressed = true;
-    } else if (e.key == "Left" || e.key == "ArrowLeft") {
-        leftPressed = true;
-    } else if (e.key == "Up" || e.key == "ArrowUp") {
-        upPressed = true;
-    } else if (e.key == "Down" || e.key == "ArrowDown") {
-        downPressed = true;
-    }
+	if (e.keyCode == 39) {
+		// rightPressed = true;
+		direction(2, 0);
+	} else if (e.keyCode == 37) {
+		// leftPressed = true;
+		direction(-2, 0);
+	} else if (e.keyCode == 38) {
+		// upPressed = true;
+		direction(0, -2);
+	} else if (e.keyCode == 40) {
+		// downPressed = true;
+		direction(0, 2);
+	}
 }
 
-// Function to check whenever button is released
-function keyUpHandler(e) {
-    if (e.key == "Right" || e.key == "ArrowRight") {
-        rightPressed = false;
-    } else if (e.key == "Left" || e.key == "ArrowLeft") {
-        leftPressed = false;
-    } else if (e.key == "Up" || e.key == "ArrowUp") {
-        upPressed = false;
-    } else if (e.key == "Down" || e.key == "ArrowDown") {
-        downPressed = false;
-    }
+function moveSnake() {
+	snakeX += directionX;
+	snakeY += directionY;
+}
+
+function direction(x, y) {
+	directionX = x;
+	directionY = y;
 }
 
 // Function to draw everything
 function draw() {
-    ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+	ctx.clearRect(0, 0, canvasWidth, canvasHeight);
 
-    drawSnake();
-    if (noOfBoxesOnCanvas === 1) {
-        drawBlocks();
-    }
+	// Check if snake hits any of the walls
+	if (
+		snakeX + snakeSize > canvasWidth ||
+		snakeX < 0 ||
+		snakeY + snakeSize > canvasHeight ||
+		snakeY < 0
+	) {
+		alert("Hit a wall");
+		document.location.reload();
+	}
 
-    // Check if snake hits any of the walls
-    if (((snakeX + snakeSize) > canvasWidth) ||
-        (snakeX < 0) ||
-        ((snakeY + snakeSize) > canvasHeight) ||
-        (snakeY < 0)) {
-        // alert("Hit a wall");
-    }
+	drawSnake();
+	drawBlocks();
+	moveSnake();
 
-    if (leftPressed) {
-        snakeX -= 3;
-    } else if (rightPressed) {
-        snakeX += 3;
-    } else if (upPressed) {
-        snakeY -= 3;
-    } else if (downPressed) {
-        snakeY += 3;
-    }
-
-    requestAnimationFrame(draw);
+	requestAnimationFrame(draw);
 }
 
 // Event listeners to the buttons
 document.addEventListener("keydown", keyDownHandler, false);
-document.addEventListener("keyup", keyUpHandler, false);
+// document.addEventListener("keyup", keyUpHandler, false);
 
 draw();
